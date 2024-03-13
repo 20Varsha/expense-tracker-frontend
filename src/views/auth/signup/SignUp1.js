@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
-
+import { NavLink, useHistory } from 'react-router-dom';
 import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
 import { REGISTER } from '../../../helpers/backendHelpers';
 import { APIClient } from '../../../helpers/apiHelpers';
 
 const SignUp1 = () => {
   const api = new APIClient();
+  const history = useHistory();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -53,9 +53,14 @@ const SignUp1 = () => {
 
       if (validateForm()) {
         const response = await api.create(REGISTER, formData);
-        console.log('Registration response:', response);
+
+        if (response.status === 'success') {
+          console.log('Registration response:', response);
+          history.push('/auth/signin-1');
+        } else {
+          console.log('Registration failed:', response.message);
+        }
       } else {
-        console.log(api.create(REGISTER));
         console.log('Form validation failed');
       }
     } catch (error) {

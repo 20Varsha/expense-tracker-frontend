@@ -1,9 +1,6 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-
-// auth provider
-
-import routes, { renderRoutes } from './routes';
+import { routes, renderRoutes } from './routes';
 
 const App = () => {
   return (
