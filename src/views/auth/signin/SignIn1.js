@@ -47,6 +47,7 @@ const Signin1 = () => {
     }
   };
 
+  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
