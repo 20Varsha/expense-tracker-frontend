@@ -1,9 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
+import { LOGIN } from '../../../helpers/backendHelpers';
+import { APIClient } from '../../../helpers/apiHelpers';
 
 const Signin1 = () => {
+  const api = new APIClient();
+  const history = useHistory();
+
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } 
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignIn = async (event) => {
+    event.preventDefault();
+
+    try {
+      if (validateForm()) {
+        const response = await api.create(LOGIN, formData);
+
+        if (response.status === 'success') {
+          localStorage.setItem('token', response.result.token); 
+          history.push('/app/dashboard/default');
+        } else {
+          console.log('Login failed:', response.message);
+        }
+      } else {
+        console.log('Form validation failed');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   return (
     <React.Fragment>
       <Breadcrumb />
@@ -23,16 +71,31 @@ const Signin1 = () => {
                     <i className="feather icon-user-plus auth-icon" />
                   </div>
                   <h3 className="mb-4">Sign In</h3>
-                  <div className="input-group mb-3">
-                    <input type="email" className="form-control" placeholder="Email address" />
-                  </div>
-                  <div className="input-group mb-4">
-                    <input type="password" className="form-control" placeholder="Password" />
-                  </div>
-                  <div className="form-check  text-start mb-4 mt-2">
-                    <input type="checkbox" className="form-check-input" id="customCheck1" defaultChecked={false} />
-                  </div>
-                  <button className="btn btn-primary mb-4">Sign In</button>
+                  <form onSubmit={handleSignIn}>
+                    <div className="input-group mb-3">
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.email && 'is-invalid'}`}
+                        placeholder="Email address"
+                      />
+                      {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+                    </div>
+                    <div className="input-group mb-4">
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className={`form-control ${errors.password && 'is-invalid'}`}
+                        placeholder="Password"
+                      />
+                      {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                    </div>
+                    <button type="submit" className="btn btn-primary mb-4">Sign In</button>
+                  </form>
                   <p className="mb-2">
                     Don&apos;t have an account?
                     <NavLink to="/auth/signUp-1" className="f-w-400">
@@ -48,4 +111,5 @@ const Signin1 = () => {
     </React.Fragment>
   );
 };
+
 export default Signin1;
