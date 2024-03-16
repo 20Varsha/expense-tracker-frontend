@@ -55,6 +55,7 @@ const SignUp1 = () => {
         const response = await api.create(REGISTER, formData);
 
         if (response.status === 'success') {
+          localStorage.setItem('authUser', response.result.token); 
           console.log('Registration response:', response);
           history.push('/auth/signin-1');
         } else {

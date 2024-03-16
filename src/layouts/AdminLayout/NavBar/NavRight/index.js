@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Dropdown } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom'; 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import ChatList from './ChatList';
@@ -10,8 +10,16 @@ import avatar2 from '../../../../assets/images/user/avatar-2.jpg';
 import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
 
+
+
 const NavRight = () => {
   const [listOpen, setListOpen] = useState(false);
+  const history = useHistory(); 
+
+  const handleLogout = () => {
+    localStorage.removeItem('authUser');
+    history.push('/auth/signin-1');
+  };
 
   const notiData = [
     {
@@ -124,7 +132,7 @@ const NavRight = () => {
               <div className="pro-head">
                 <img src={avatar1} className="img-radius" alt="User Profile" />
                 <span>John Doe</span>
-                <Link to="#" className="dud-logout" title="Logout">
+                <Link to="#" className="dud-logout" title="Logout" >
                   <i className="feather icon-log-out" />
                 </Link>
               </div>
@@ -150,7 +158,7 @@ const NavRight = () => {
                   </Link>
                 </ListGroup.Item>
                 <ListGroup.Item as="li" bsPrefix=" ">
-                  <Link to="#" className="dropdown-item">
+                  <Link to="#" className="dropdown-item" onClick={handleLogout}>
                     <i className="feather icon-log-out" /> Logout
                   </Link>
                 </ListGroup.Item>

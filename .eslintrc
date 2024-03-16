@@ -68,6 +68,7 @@
     "import/no-named-as-default": "off",
     "import/no-extraneous-dependencies": "off",
     "jsx-a11y/no-autofocus": "off",
+    "react/no-unescaped-entities": 0,
     "no-restricted-imports": [
       "error",
       {

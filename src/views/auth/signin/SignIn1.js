@@ -4,6 +4,8 @@ import { NavLink, useHistory } from 'react-router-dom';
 import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
 import { LOGIN } from '../../../helpers/backendHelpers';
 import { APIClient } from '../../../helpers/apiHelpers';
+import { toast,ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Signin1 = () => {
   const api = new APIClient();
@@ -21,7 +23,7 @@ const Signin1 = () => {
     }
     if (!formData.password.trim()) {
       newErrors.password = 'Password is required';
-    } 
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -34,20 +36,29 @@ const Signin1 = () => {
         const response = await api.create(LOGIN, formData);
 
         if (response.status === 'success') {
-          localStorage.setItem('token', response.result.token); 
+          toast.success('Login successful');
           history.push('/app/dashboard/default');
-        } else {
+          localStorage.setItem('authUser', response.result.token);
+        } else if (response.status === 'error') {
+          if (response.message === "User not found") {
+            toast.error("User not found. Please check your credentials.");
+          } else if (response.message === "Mismatch") {
+            toast.error("Password mismatch. Please check your credentials.");
+          } else {
+            toast.error('Login failed');
+          }
           console.log('Login failed:', response.message);
         }
       } else {
+        toast.error('Form validation failed');
         console.log('Form validation failed');
       }
     } catch (error) {
+      toast.error('Error during login');
       console.error('Error during login:', error);
     }
   };
 
-  
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
@@ -57,6 +68,7 @@ const Signin1 = () => {
     <React.Fragment>
       <Breadcrumb />
       <div className="auth-wrapper">
+      <ToastContainer />
         <div className="auth-content">
           <div className="auth-bg">
             <span className="r" />
@@ -98,7 +110,7 @@ const Signin1 = () => {
                     <button type="submit" className="btn btn-primary mb-4">Sign In</button>
                   </form>
                   <p className="mb-2">
-                    Don&apos;t have an account?
+                    Don't have an account?
                     <NavLink to="/auth/signUp-1" className="f-w-400">
                       Sign Up
                     </NavLink>
