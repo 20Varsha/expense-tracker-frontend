@@ -12,7 +12,15 @@ const menuItems = {
           type: 'item',
           icon: 'feather icon-home',
           url: '/app/dashboard/default'
-        }
+        },
+        {
+          id: 'sample-page',
+          title: 'Income',
+          type: 'item',
+          url: '/income-page',
+          classes: 'nav-item',
+          icon: 'feather icon-sidebar'
+        },
       ]
     },
     // {
@@ -151,14 +159,7 @@ const menuItems = {
     //         }
     //       ]
     //     },
-        {
-          id: 'sample-page',
-          title: 'Sample Page',
-          type: 'item',
-          url: '/sample-page',
-          classes: 'nav-item',
-          icon: 'feather icon-sidebar'
-        },
+  
     //     // {
     //     //   id: 'documentation',
     //     //   title: 'Documentation',

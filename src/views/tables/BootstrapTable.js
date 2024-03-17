@@ -170,7 +170,7 @@ const BootstrapTable = () => {
             <Card.Header>
               <Card.Title as="h5">Contextual Classes</Card.Title>
               <span className="d-block m-t-5">
-                use props <code>className=&quot;table-*&quot;</code> with <code>tr</code> element
+                use props <code>className="table-*"</code> with <code>tr</code> element
               </span>
             </Card.Header>
             <Card.Body>

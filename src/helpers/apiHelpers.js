@@ -2,11 +2,40 @@ import axios from "axios";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
-const token = JSON.parse(localStorage.getItem("authUser"))
-  ? JSON.parse(localStorage.getItem("authUser"))
-  : null;
+const authUserString = localStorage.getItem("authUser");
+console.log("Auth User String:", authUserString);
 
-if (token) axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+let token = null;
+
+if (authUserString) {
+  try {
+    const [, payloadBase64] = authUserString.split('.'); 
+    const payloadJson = atob(payloadBase64); 
+    const payload = JSON.parse(payloadJson); 
+
+    const userEmail = payload.email;
+    const userId = payload.userId;
+
+    console.log("User Email:", userEmail);
+    console.log("User ID:", userId);
+
+    if (payload.result && payload.result.token) {
+      token = payload.result.token;
+    } else {
+      console.warn("Invalid authUserString format: 'result' or 'token' property not found. Defaulting token to null.");
+    }
+  } catch (error) {
+    console.error("Error parsing authUserString:", error);
+  }
+} else {
+  console.warn("authUserString is empty. Defaulting token to null.");
+}
+
+
+if (token) {
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+}
+
 
 // intercepting to capture errors
 axios.interceptors.response.use(
@@ -40,57 +69,65 @@ const setAuthorization = (token) => {
   axios.defaults.headers.common["Authorization"] = token;
 };
 
-const setUrl = (path) => {
+const setUrl = () => {
   axios.defaults.baseURL = `http://localhost:3000/api/v1`
-
-  if (path) {
-    axios.defaults.baseURL = `http://localhost:3000/api/v1`
-  }
+  console.log(axios.defaults.baseURL);
 }
 
 class APIClient {
 
-  get = (url, params, path) => {
-    let service = path || null
-    setUrl(service);
-    let response;
-    const authToken = JSON.parse(localStorage.getItem("authUser"))
-      ? JSON.parse(localStorage.getItem("authUser")).result.token
-      : null;
-    if (authToken) axios.defaults.headers.common["Authorization"] = "Bearer " + authToken;
-    let paramKeys = [];
+  get = async (url) => {
+    console.log("url:", url);
+  
+    const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
+    console.log("baseURL", baseURL);
 
-    if (params) {
-      Object.keys(params).map((key) => {
-        paramKeys.push(key + "=" + params[key]);
-        return paramKeys;
+    const authToken = localStorage.getItem("authUser");
+    console.log("authToken", authToken);
+  
+    try {
+      const response = await axios.get(`${baseURL}${url}`, {
+        headers: {
+          Authorization: authToken ? `${authToken}` : null
+        }
       });
-
-      const queryString =
-        paramKeys && paramKeys.length ? paramKeys.join("&") : "";
-      response = axios.get(`${url}?${queryString}`, params);
-    } else {
-      response = axios.get(`${url}`, params);
+  
+      console.log("response:", response);
+      return response;
+    } catch (error) {
+      console.error(`Error retrieving data from ${baseURL}${url}:`, error);
+      throw error;
     }
-
-    return response;
   };
+  
 
   /**
    * post given data to url
    */
-  create = (url, data, path) => {
-    console.log("path",path);
-    console.log("Url",url);
-    let service = path || null
-    console.log("service",service);
-    setUrl(service);
-    const authToken = JSON.parse(localStorage.getItem("authUser"))
-      ? JSON.parse(localStorage.getItem("authUser")).result.token
-      : null;
-    if (authToken) axios.defaults.headers.common["Authorization"] = "Bearer " + authToken;
-    return axios.post(url, data);
-  };
+  create = async (url, data) => {
+    console.log("url:", url);
+  
+    const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
+    console.log("baseURL", baseURL);
+
+    const authToken = localStorage.getItem("authUser");
+    console.log("authToken", authToken);
+  
+    try {
+      const response = await axios.post(`${baseURL}${url}`, data, {
+        headers: {
+          Authorization: authToken ? `${authToken}` : null
+        }
+      });
+  
+      console.log("response:", response);
+      return response;
+    } catch (error) {
+      console.error(`Error retrieving data from ${baseURL}${url}:`, error);
+      throw error;
+    }
+};
+
 
   /**
    * Updates data

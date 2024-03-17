@@ -58,8 +58,8 @@ const routes = [
       },
       {
         exact: true,
-        path: '/sample-page',
-        element: lazy(() => import('./views/extra/SamplePage'))
+        path: '/income-page',
+        element: lazy(() => import('./views/pages/income'))
       }
     ]
   }
