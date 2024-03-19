@@ -9,9 +9,9 @@ let token = null;
 
 if (authUserString) {
   try {
-    const [, payloadBase64] = authUserString.split('.'); 
-    const payloadJson = atob(payloadBase64); 
-    const payload = JSON.parse(payloadJson); 
+    const [, payloadBase64] = authUserString.split('.');
+    const payloadJson = atob(payloadBase64);
+    const payload = JSON.parse(payloadJson);
 
     const userEmail = payload.email;
     const userId = payload.userId;
@@ -78,20 +78,20 @@ class APIClient {
 
   get = async (url) => {
     console.log("url:", url);
-  
+
     const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
     console.log("baseURL", baseURL);
 
     const authToken = localStorage.getItem("authUser");
     console.log("authToken", authToken);
-  
+
     try {
       const response = await axios.get(`${baseURL}${url}`, {
         headers: {
           Authorization: authToken ? `${authToken}` : null
         }
       });
-  
+
       console.log("response:", response);
       return response;
     } catch (error) {
@@ -99,60 +99,70 @@ class APIClient {
       throw error;
     }
   };
-  
+
 
   /**
    * post given data to url
    */
   create = async (url, data) => {
-    console.log("url:", url);
-  
     const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
-    console.log("baseURL", baseURL);
-
     const authToken = localStorage.getItem("authUser");
-    console.log("authToken", authToken);
-  
     try {
       const response = await axios.post(`${baseURL}${url}`, data, {
         headers: {
           Authorization: authToken ? `${authToken}` : null
         }
       });
-  
-      console.log("response:", response);
       return response;
     } catch (error) {
       console.error(`Error retrieving data from ${baseURL}${url}:`, error);
       throw error;
     }
-};
+  };
 
 
   /**
    * Updates data
    */
-  update = (url, data, path) => {
-    let service = path || null
-    setUrl(service);
-    const authToken = JSON.parse(localStorage.getItem("authUser"))
-      ? JSON.parse(localStorage.getItem("authUser")).result.token
-      : null;
-    if (authToken) axios.defaults.headers.common["Authorization"] = "Bearer " + authToken;
-    return axios.patch(url, data);
+  update = async (url, data) => {
+    const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
+    const authToken = localStorage.getItem("authUser");
+    try {
+      const response = await axios.patch(`${baseURL}${url}`, data, {
+        headers: {
+          Authorization: authToken ? `${authToken}` : null
+        }
+      });
+      return response;
+    } catch (error) {
+      console.error(`Error retrieving data from ${baseURL}${url}:`, error);
+      throw error;
+    }
   };
 
   /**
    * Delete
    */
 
-  delete = (url, config) => {
-    const authToken = JSON.parse(localStorage.getItem("authUser"))
-      ? JSON.parse(localStorage.getItem("authUser")).result.token
-      : null;
-    if (authToken) axios.defaults.headers.common["Authorization"] = "Bearer " + authToken;
-    return axios.delete(url, { ...config });
-  };
+  delete = async (url) => {
+    const baseURL = axios.defaults.baseURL || 'http://localhost:3000/api/v1';
+    const authToken = localStorage.getItem("authUser");
+    console.log(baseURL);
+    console.log(authToken);
+
+    try {
+      const response = await axios.delete(`${baseURL}${url}`, {
+        headers: {
+          Authorization: authToken ? `${authToken}` : null
+        }
+      });
+      console.log("response",response);
+      return response;
+    } catch (error) {
+      console.error(`Error retrieving data from ${baseURL}${url}:`, error);
+      throw error;
+    }
+  }
 }
 
 const getLoggedinUser = () => {
